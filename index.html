@@ -566,6 +566,106 @@ function buildSuperscriptMap() {
   return m;
 }
 
+function buildNegCircledMap() {
+  const m = {};
+  for (let i = 0; i < 26; i++) {
+    m[String.fromCodePoint(65 + i)] = String.fromCodePoint(0x1F150 + i);
+    m[String.fromCodePoint(97 + i)] = String.fromCodePoint(0x1F150 + i);
+  }
+  return m;
+}
+
+function buildParenthesizedMap() {
+  const m = {};
+  for (let i = 0; i < 26; i++) {
+    m[String.fromCodePoint(65 + i)] = String.fromCodePoint(0x1F110 + i);
+    m[String.fromCodePoint(97 + i)] = String.fromCodePoint(0x249C + i);
+  }
+  return m;
+}
+
+function buildSubscriptMap() {
+  const sub = {
+    a: 0x2090, e: 0x2091, h: 0x2095, i: 0x1D62, j: 0x2C7C,
+    k: 0x2096, l: 0x2097, m: 0x2098, n: 0x2099, o: 0x2092,
+    p: 0x209A, r: 0x1D63, s: 0x209B, t: 0x209C, u: 0x1D64,
+    v: 0x1D65, x: 0x2093,
+    '0': 0x2080, '1': 0x2081, '2': 0x2082, '3': 0x2083,
+    '4': 0x2084, '5': 0x2085, '6': 0x2086, '7': 0x2087,
+    '8': 0x2088, '9': 0x2089
+  };
+  const m = {};
+  for (const [k, v] of Object.entries(sub)) {
+    m[k] = String.fromCodePoint(v);
+    if (k.match(/[a-z]/)) m[k.toUpperCase()] = String.fromCodePoint(v);
+  }
+  return m;
+}
+
+function buildRegionalMap() {
+  const m = {};
+  for (let i = 0; i < 26; i++) {
+    m[String.fromCodePoint(65 + i)] = String.fromCodePoint(0x1F1E6 + i);
+    m[String.fromCodePoint(97 + i)] = String.fromCodePoint(0x1F1E6 + i);
+  }
+  return m;
+}
+
+function buildUpsideDownMap() {
+  return {
+    'a': '\u0250', 'b': 'q', 'c': '\u0254', 'd': 'p', 'e': '\u01DD',
+    'f': '\u025F', 'g': '\u0253', 'h': '\u0265', 'i': '\u0131', 'j': '\u027E',
+    'k': '\u029E', 'l': 'l', 'm': '\u026F', 'n': 'u', 'o': 'o',
+    'p': 'd', 'q': 'b', 'r': '\u0279', 's': 's', 't': '\u0287',
+    'u': 'n', 'v': '\u028C', 'w': '\u028D', 'x': 'x', 'y': '\u028E', 'z': 'z',
+    'A': '\u2200', 'B': '\u15FA', 'C': '\u0186', 'D': '\u15E1', 'E': '\u018E',
+    'F': '\u2132', 'G': '\u2141', 'H': 'H', 'I': 'I', 'J': '\u017F',
+    'K': '\u22CA', 'L': '\u2142', 'M': 'W', 'N': 'N', 'O': 'O',
+    'P': '\u0500', 'Q': '\u038C', 'R': '\u1D1A', 'S': 'S', 'T': '\u22A5',
+    'U': '\u2229', 'V': '\u039B', 'W': 'M', 'X': 'X', 'Y': '\u2144', 'Z': 'Z',
+    '0': '0', '1': '\u0196', '2': '\u1105', '3': '\u0190', '4': '\u3123',
+    '5': '\u03DB', '6': '9', '7': '\u3125', '8': '8', '9': '6',
+    '.': '\u02D9', ',': '\u02BB', '?': '\u00BF', '!': '\u00A1',
+    "'": ',', '(': ')', ')': '(',
+    '[': ']', ']': '[', '{': '}', '}': '{',
+    '<': '>', '>': '<', '_': '\u203E'
+  };
+}
+
+function buildLeetspeakMap() {
+  return {
+    'A': '4', 'B': '8', 'C': '(', 'D': '|)', 'E': '3',
+    'F': '|=', 'G': '6', 'H': '#', 'I': '1', 'J': ']',
+    'K': '|<', 'L': '|_', 'M': '|V|', 'N': '/V', 'O': '0',
+    'P': '|>', 'Q': '0,', 'R': '|2', 'S': '5', 'T': '7',
+    'U': '|_|', 'V': '\\/', 'W': '\\/\\/', 'X': '><', 'Y': '`/', 'Z': '2',
+    'a': '4', 'b': '8', 'c': '(', 'd': '|)', 'e': '3',
+    'f': '|=', 'g': '6', 'h': '#', 'i': '1', 'j': ']',
+    'k': '|<', 'l': '|_', 'm': '|V|', 'n': '/V', 'o': '0',
+    'p': '|>', 'q': '0,', 'r': '|2', 's': '5', 't': '7',
+    'u': '|_|', 'v': '\\/', 'w': '\\/\\/', 'x': '><', 'y': '`/', 'z': '2'
+  };
+}
+
+function buildBrailleMap() {
+  var codes = [0x2801,0x2803,0x2809,0x2819,0x2811,0x280B,0x281B,0x2813,0x280A,0x281A,0x2805,0x2807,0x280D,0x281D,0x2815,0x280F,0x281F,0x2817,0x280E,0x281E,0x2825,0x2827,0x283A,0x282D,0x283D,0x2835];
+  const m = {};
+  for (let i = 0; i < 26; i++) {
+    m[String.fromCodePoint(97 + i)] = String.fromCodePoint(codes[i]);
+    m[String.fromCodePoint(65 + i)] = String.fromCodePoint(codes[i]);
+  }
+  m[' '] = '\u2800';
+  return m;
+}
+
+function buildMorseMap() {
+  var codes = {A:'.-',B:'-...',C:'-.-.',D:'-..',E:'.',F:'..-.',G:'--.',H:'....',I:'..',J:'.---',K:'-.-',L:'.-..',M:'--',N:'-.',O:'---',P:'.--.',Q:'--.-',R:'.-.',S:'...',T:'-',U:'..-',V:'...-',W:'.--',X:'-..-',Y:'-.--',Z:'--..'};
+  codes['0']='-----';codes['1']='.----';codes['2']='..---';codes['3']='...--';codes['4']='....-';codes['5']='.....';codes['6']='-....';codes['7']='--...';codes['8']='---..';codes['9']='----.';
+  var m = {};
+  for (var k in codes) { m[k] = codes[k]; if (k.match(/[A-Z]/)) m[k.toLowerCase()] = codes[k]; }
+  return m;
+}
+
 // ── Style Registry ──────────────────────────────────────────────────────
 
 const STYLES = [
@@ -588,6 +688,63 @@ const STYLES = [
   { id: 'fullwidth',      name: 'Fullwidth',        map: buildFullwidthMap() },
   { id: 'small-caps',     name: 'Small Caps',       map: buildSmallCapsMap() },
   { id: 'superscript',    name: 'Superscript',      map: buildSuperscriptMap() },
+  { id: 'neg-circled',    name: 'Neg. Circled',     map: buildNegCircledMap() },
+  { id: 'parenthesized',  name: 'Parenthesized',    map: buildParenthesizedMap() },
+  { id: 'subscript',      name: 'Subscript',        map: buildSubscriptMap() },
+  { id: 'regional',       name: 'Regional',         map: buildRegionalMap() },
+  { id: 'braille',        name: 'Braille',          map: buildBrailleMap() },
+  { id: 'leetspeak',      name: 'Leetspeak',        map: buildLeetspeakMap() },
+  { id: 'upside-down',    name: 'Upside Down',      transform: function(text) {
+    return Array.from(mapCharsRaw(text, buildUpsideDownMap())).reverse().join('');
+  }},
+  { id: 'reversed',       name: 'Reversed',         transform: function(text) {
+    return Array.from(text).reverse().join('');
+  }},
+  { id: 'vaporwave',      name: 'Vaporwave',        transform: function(text) {
+    return Array.from(mapCharsRaw(text, buildFullwidthMap())).join(' ');
+  }},
+  { id: 'zalgo',          name: 'Zalgo',            transform: function(text) {
+    var above = [0x030D,0x030E,0x0304,0x0305,0x033F,0x0311,0x0306,0x0310,0x0352,0x0357,0x0351,0x0307,0x0308,0x030A,0x0342,0x0343,0x0344,0x034A,0x034B,0x034C,0x0303,0x0302,0x030C,0x0350,0x0300,0x0301,0x030B,0x030F,0x0312,0x0313,0x0314,0x033D,0x0309];
+    var below = [0x0316,0x0317,0x0318,0x0319,0x031C,0x031D,0x031E,0x031F,0x0320,0x0324,0x0325,0x0326,0x0329,0x032A,0x032B,0x032C,0x032D,0x032E,0x032F,0x0330,0x0331,0x0332,0x0333,0x0339,0x033A,0x033B,0x033C,0x0345,0x0347,0x0348,0x0349,0x034D,0x034E,0x0353,0x0354,0x0355,0x0356,0x0359,0x035A,0x0323];
+    var result = '';
+    for (var ch of text) {
+      result += ch;
+      if (!/\s/.test(ch)) {
+        var na = Math.floor(Math.random() * 6) + 2;
+        var nb = Math.floor(Math.random() * 6) + 2;
+        for (var i = 0; i < na; i++) result += String.fromCodePoint(above[Math.floor(Math.random() * above.length)]);
+        for (var i = 0; i < nb; i++) result += String.fromCodePoint(below[Math.floor(Math.random() * below.length)]);
+      }
+    }
+    return result;
+  }},
+  { id: 'morse',          name: 'Morse Code',       transform: function(text) {
+    var m = buildMorseMap();
+    return text.split(' ').map(function(w) {
+      return Array.from(w).map(function(c) { return m[c] || c; }).join(' ');
+    }).join('   ');
+  }},
+  { id: 'dotted',         name: 'Dotted',           transform: function(text) {
+    var result = '';
+    for (var ch of text) {
+      result += ch;
+      if (!/\s/.test(ch)) result += '\u0307\u0323';
+    }
+    return result;
+  }},
+  { id: 'wavy',           name: 'Wavy',             transform: function(text) {
+    var sup = buildSuperscriptMap();
+    var result = '', idx = 0;
+    for (var ch of text) {
+      if (/\s/.test(ch)) { result += ch; }
+      else { result += (idx % 2 === 0) ? ch : (sup[ch] || ch); idx++; }
+    }
+    return result;
+  }},
+  { id: 'straight-outta', name: 'Straight Outta',   transform: function(text) {
+    var m = buildNegSquaredMap();
+    return mapCharsRaw('STRAIGHT OUTTA ', m) + mapCharsRaw(text.toUpperCase(), m);
+  }},
 ];
 
 const COMBINING = {
@@ -607,7 +764,7 @@ var lastInput = localStorage.getItem('sts-input') || '';
 
 // ── Core Functions ──────────────────────────────────────────────────────
 
-function stylize(text, styleMap) {
+function mapChars(text, styleMap) {
   var result = '';
   for (var ch of text) {
     var mapped = styleMap[ch] !== undefined ? styleMap[ch] : ch;
@@ -619,6 +776,19 @@ function stylize(text, styleMap) {
     result += mapped;
   }
   return result;
+}
+
+function mapCharsRaw(text, styleMap) {
+  var result = '';
+  for (var ch of text) {
+    result += styleMap[ch] !== undefined ? styleMap[ch] : ch;
+  }
+  return result;
+}
+
+function stylize(text, style) {
+  if (style.transform) return style.transform(text);
+  return mapChars(text, style);
 }
 
 function saveFavorites() {
@@ -736,14 +906,14 @@ function updateAllPreviews() {
   var text = inputEl.value;
   for (var i = 0; i < STYLES.length; i++) {
     var style = STYLES[i];
-    var styled = text ? stylize(text, style.map) : '';
+    var styled = text ? stylize(text, style) : '';
     var refs = [cardRefs[style.id], favCardRefs[style.id]].filter(Boolean);
     for (var j = 0; j < refs.length; j++) {
       if (text) {
         refs[j].preview.textContent = styled;
         refs[j].preview.classList.remove('empty');
       } else {
-        refs[j].preview.textContent = stylize('Preview', style.map);
+        refs[j].preview.textContent = stylize('Preview', style);
         refs[j].preview.classList.add('empty');
       }
     }
@@ -767,7 +937,7 @@ function copyFromCard(card, style) {
     showToast('Type something first!');
     return;
   }
-  var styled = stylize(text, style.map);
+  var styled = stylize(text, style);
   navigator.clipboard.writeText(styled).then(function() {
     card.classList.add('copied');
     setTimeout(function() { card.classList.remove('copied'); }, 800);

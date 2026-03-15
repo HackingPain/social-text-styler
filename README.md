@@ -8,7 +8,7 @@ A single-file web app with no dependencies. Just open `index.html` in any browse
 
 ### Features
 
-- **19 Unicode styles** - Bold, Italic, Script, Fraktur, Double-Struck, Monospace, Circled, Squared, Fullwidth, Small Caps, Superscript, and more
+- **33 Unicode styles** - Bold, Italic, Script, Fraktur, Double-Struck, Monospace, Circled, Squared, Fullwidth, Small Caps, Superscript, Upside Down, Zalgo, Vaporwave, Leetspeak, Braille, Morse Code, Straight Outta, and more
 - **Live preview grid** - type once, see all styles simultaneously
 - **One-click copy** - click any style card to copy to clipboard
 - **Stackable modifiers** - underline, strikethrough, and overline combine with any style
