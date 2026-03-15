@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Social Text Styler</title>
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg: #0a0e14;
+  --surface: rgba(255,255,255,0.04);
+  --surface-hover: rgba(255,255,255,0.08);
+  --surface-active: rgba(255,255,255,0.12);
+  --border: rgba(255,255,255,0.08);
+  --border-bright: rgba(255,255,255,0.15);
+  --text: #e8eaed;
+  --text-dim: #9aa0a6;
+  --text-faint: #5f6368;
+  --accent: #8ab4f8;
+  --accent-dim: rgba(138,180,248,0.15);
+  --accent-glow: rgba(138,180,248,0.25);
+  --gold: #fdd663;
+  --gold-dim: rgba(253,214,99,0.15);
+  --success: #81c995;
+  --radius: 12px;
+  --radius-sm: 8px;
+  --transition: 0.2s ease;
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  line-height: 1.5;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(138,180,248,0.06) 0%, transparent 60%),
+              radial-gradient(ellipse at 80% 100%, rgba(253,214,99,0.03) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.container {
+  position: relative;
+  z-index: 1;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 20px 60px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+header h1 {
+  font-size: 2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  background: linear-gradient(135deg, var(--text) 0%, var(--accent) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+header p {
+  color: var(--text-dim);
+  font-size: 0.95rem;
+  margin-top: 4px;
+}
+
+.input-section { margin-bottom: 24px; }
+
+.input-wrapper {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  backdrop-filter: blur(20px);
+  transition: border-color var(--transition);
+}
+
+.input-wrapper:focus-within {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 16px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-family: inherit;
+  font-size: 1.05rem;
+  line-height: 1.6;
+  resize: vertical;
+  outline: none;
+}
+
+textarea::placeholder { color: var(--text-faint); }
+
+.input-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 16px;
+  border-top: 1px solid var(--border);
+  font-size: 0.8rem;
+  color: var(--text-faint);
+}
+
+.char-count { font-variant-numeric: tabular-nums; }
+
+.char-bar {
+  width: 60px;
+  height: 3px;
+  background: var(--surface-active);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-left: 8px;
+}
+
+.char-bar-fill {
+  height: 100%;
+  background: var(--accent);
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.modifiers {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 20px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+
+.modifiers-label {
+  font-size: 0.8rem;
+  color: var(--text-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  margin-right: 4px;
+}
+
+.mod-btn {
+  padding: 6px 14px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  color: var(--text-dim);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all var(--transition);
+  user-select: none;
+}
+
+.mod-btn:hover { background: var(--surface-hover); border-color: var(--border-bright); }
+
+.mod-btn.active {
+  background: var(--accent-dim);
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.mod-btn .example {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.section-header h2 {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.section-header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--border);
+}
+
+.favorites-section {
+  margin-bottom: 28px;
+  display: none;
+}
+
+.favorites-section.has-favorites { display: block; }
+
+.style-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 12px;
+}
+
+.style-card {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+  cursor: pointer;
+  transition: all var(--transition);
+  backdrop-filter: blur(20px);
+  animation: cardIn 0.3s ease both;
+}
+
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.style-card:hover {
+  background: var(--surface-hover);
+  border-color: var(--border-bright);
+  transform: translateY(-1px);
+}
+
+.style-card:active {
+  transform: translateY(0);
+  background: var(--surface-active);
+}
+
+.style-card.copied {
+  border-color: var(--success);
+  box-shadow: 0 0 0 3px rgba(129,201,149,0.15);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.card-name {
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.card-actions {
+  display: flex;
+  gap: 4px;
+  align-items: center;
+}
+
+.card-btn {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  border-radius: 6px;
+  color: var(--text-faint);
+  cursor: pointer;
+  transition: all var(--transition);
+  font-size: 0.85rem;
+}
+
+.card-btn:hover { background: var(--surface-hover); color: var(--text-dim); }
+.card-btn.fav-btn.active { color: var(--gold); }
+
+.card-preview {
+  font-size: 1.1rem;
+  line-height: 1.5;
+  word-break: break-word;
+  color: var(--text);
+  min-height: 1.6em;
+}
+
+.card-preview.empty { color: var(--text-faint); font-style: italic; font-size: 0.9rem; }
+
+.copy-toast {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: var(--success);
+  color: #0a0e14;
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.15s ease;
+}
+
+.style-card.copied .copy-toast { opacity: 1; }
+
+.keyboard-hint {
+  text-align: center;
+  margin-top: 24px;
+  font-size: 0.78rem;
+  color: var(--text-faint);
+}
+
+kbd {
+  display: inline-block;
+  padding: 2px 6px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 4px;
+  font-family: inherit;
+  font-size: 0.85em;
+}
+
+.global-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(20px);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(20px);
+  color: var(--text);
+  padding: 10px 20px;
+  border-radius: 24px;
+  font-size: 0.88rem;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.global-toast.show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+
+@media (max-width: 640px) {
+  .container { padding: 16px 12px 40px; }
+  header h1 { font-size: 1.5rem; }
+  .style-grid { grid-template-columns: 1fr; }
+  textarea { font-size: 1rem; min-height: 80px; }
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.style-card:focus-visible {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-dim);
+}
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--surface-active); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--border-bright); }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>Social Text Styler</h1>
+    <p>Type once, see every Unicode style. Click any card to copy.</p>
+  </header>
+
+  <section class="input-section">
+    <div class="input-wrapper">
+      <textarea id="input" placeholder="Type your text here..." autofocus spellcheck="false" aria-label="Text input"></textarea>
+      <div class="input-footer">
+        <span class="char-count" id="charCount">0 characters</span>
+        <div class="char-bar"><div class="char-bar-fill" id="charBar"></div></div>
+      </div>
+    </div>
+  </section>
+
+  <div class="modifiers" role="group" aria-label="Text modifiers">
+    <span class="modifiers-label">Modifiers</span>
+    <button class="mod-btn" data-mod="underline" aria-pressed="false">
+      Underline <span class="example">a&#x0332;b&#x0332;c&#x0332;</span>
+    </button>
+    <button class="mod-btn" data-mod="strikethrough" aria-pressed="false">
+      Strikethrough <span class="example">a&#x0336;b&#x0336;c&#x0336;</span>
+    </button>
+    <button class="mod-btn" data-mod="overline" aria-pressed="false">
+      Overline <span class="example">a&#x0305;b&#x0305;c&#x0305;</span>
+    </button>
+  </div>
+
+  <section class="favorites-section" id="favoritesSection">
+    <div class="section-header">
+      <h2>Favorites</h2>
+    </div>
+    <div class="style-grid" id="favoritesGrid"></div>
+  </section>
+
+  <section>
+    <div class="section-header">
+      <h2>All Styles</h2>
+    </div>
+    <div class="style-grid" id="stylesGrid"></div>
+  </section>
+
+  <p class="keyboard-hint">
+    <kbd>Tab</kbd> to navigate cards &middot; <kbd>Enter</kbd> or <kbd>Space</kbd> to copy
+  </p>
+</div>
+
+<div class="global-toast" id="globalToast"></div>
+
+<script>
+// ── Unicode Mapping Engine ──────────────────────────────────────────────
+
+function alphaMap(startUC, startLC) {
+  const m = {};
+  for (let i = 0; i < 26; i++) {
+    m[String.fromCodePoint(65 + i)] = String.fromCodePoint(startUC + i);
+    m[String.fromCodePoint(97 + i)] = String.fromCodePoint(startLC + i);
+  }
+  return m;
+}
+
+function digitMap(startDigit) {
+  const m = {};
+  for (let i = 0; i < 10; i++) {
+    m[String(i)] = String.fromCodePoint(startDigit + i);
+  }
+  return m;
+}
+
+function manualMap(obj) {
+  const m = {};
+  for (const [k, v] of Object.entries(obj)) {
+    m[k] = typeof v === 'number' ? String.fromCodePoint(v) : v;
+  }
+  return m;
+}
+
+const scriptUCExceptions = { B: 0x212C, E: 0x2130, F: 0x2131, H: 0x210B, I: 0x2110, L: 0x2112, M: 0x2133, R: 0x211B };
+const scriptLCExceptions = { e: 0x212F, g: 0x210A, o: 0x2134 };
+const frakturUCExceptions = { C: 0x212D, H: 0x210C, I: 0x2111, R: 0x211C, Z: 0x2128 };
+const dblstruckUCExceptions = { C: 0x2102, H: 0x210D, N: 0x2115, P: 0x2119, Q: 0x211A, R: 0x211D, Z: 0x2124 };
+
+function buildScriptMap() {
+  const m = alphaMap(0x1D49C, 0x1D4B6);
+  Object.assign(m, manualMap(scriptUCExceptions), manualMap(scriptLCExceptions));
+  return m;
+}
+
+function buildFrakturMap() {
+  const m = alphaMap(0x1D504, 0x1D51E);
+  Object.assign(m, manualMap(frakturUCExceptions));
+  return m;
+}
+
+function buildDoubleStruckMap() {
+  const m = alphaMap(0x1D538, 0x1D552);
+  Object.assign(m, manualMap(dblstruckUCExceptions));
+  Object.assign(m, digitMap(0x1D7D8));
+  return m;
+}
+
+function buildCircledMap() {
+  const m = {};
+  for (let i = 0; i < 26; i++) {
+    m[String.fromCodePoint(65 + i)] = String.fromCodePoint(0x24B6 + i);
+    m[String.fromCodePoint(97 + i)] = String.fromCodePoint(0x24D0 + i);
+  }
+  m['0'] = String.fromCodePoint(0x24EA);
+  for (let i = 1; i <= 9; i++) {
+    m[String(i)] = String.fromCodePoint(0x245F + i);
+  }
+  return m;
+}
+
+function buildSquaredMap() {
+  const m = {};
+  for (let i = 0; i < 26; i++) {
+    m[String.fromCodePoint(65 + i)] = String.fromCodePoint(0x1F130 + i);
+    m[String.fromCodePoint(97 + i)] = String.fromCodePoint(0x1F130 + i);
+  }
+  return m;
+}
+
+function buildNegSquaredMap() {
+  const m = {};
+  for (let i = 0; i < 26; i++) {
+    m[String.fromCodePoint(65 + i)] = String.fromCodePoint(0x1F170 + i);
+    m[String.fromCodePoint(97 + i)] = String.fromCodePoint(0x1F170 + i);
+  }
+  return m;
+}
+
+function buildFullwidthMap() {
+  const m = {};
+  for (let i = 0; i < 26; i++) {
+    m[String.fromCodePoint(65 + i)] = String.fromCodePoint(0xFF21 + i);
+    m[String.fromCodePoint(97 + i)] = String.fromCodePoint(0xFF41 + i);
+  }
+  for (let i = 0; i < 10; i++) {
+    m[String(i)] = String.fromCodePoint(0xFF10 + i);
+  }
+  const punct = ' !"#$%&\'()*+,-./:;<=>?@[\\]^_`{|}~';
+  for (const ch of punct) {
+    const code = ch.charCodeAt(0);
+    if (code >= 0x21 && code <= 0x7E) {
+      m[ch] = String.fromCodePoint(0xFF01 + (code - 0x21));
+    }
+  }
+  m[' '] = '\u3000';
+  return m;
+}
+
+function buildSmallCapsMap() {
+  const sc = {
+    a: 0x1D00, b: 0x0299, c: 0x1D04, d: 0x1D05, e: 0x1D07,
+    f: 0xA730, g: 0x0262, h: 0x029C, i: 0x026A, j: 0x1D0A,
+    k: 0x1D0B, l: 0x029F, m: 0x1D0D, n: 0x0274, o: 0x1D0F,
+    p: 0x1D18, r: 0x0280, s: 0xA731, t: 0x1D1B,
+    u: 0x1D1C, v: 0x1D20, w: 0x1D21, y: 0x028F, z: 0x1D22
+  };
+  const m = {};
+  for (const [k, v] of Object.entries(sc)) {
+    m[k] = String.fromCodePoint(v);
+    m[k.toUpperCase()] = k.toUpperCase();
+  }
+  return m;
+}
+
+function buildSuperscriptMap() {
+  const sup = {
+    a: 0x1D43, b: 0x1D47, c: 0x1D9C, d: 0x1D48, e: 0x1D49,
+    f: 0x1DA0, g: 0x1D4D, h: 0x02B0, i: 0x2071, j: 0x02B2,
+    k: 0x1D4F, l: 0x02E1, m: 0x1D50, n: 0x207F, o: 0x1D52,
+    p: 0x1D56, r: 0x02B3, s: 0x02E2, t: 0x1D57,
+    u: 0x1D58, v: 0x1D5B, w: 0x02B7, x: 0x02E3, y: 0x02B8, z: 0x1DBB,
+    '0': 0x2070, '1': 0x00B9, '2': 0x00B2, '3': 0x00B3,
+    '4': 0x2074, '5': 0x2075, '6': 0x2076, '7': 0x2077,
+    '8': 0x2078, '9': 0x2079
+  };
+  const m = {};
+  for (const [k, v] of Object.entries(sup)) {
+    m[k] = String.fromCodePoint(v);
+    if (k.match(/[a-z]/)) m[k.toUpperCase()] = String.fromCodePoint(v);
+  }
+  return m;
+}
+
+// ── Style Registry ──────────────────────────────────────────────────────
+
+const STYLES = [
+  { id: 'bold',           name: 'Bold',            map: { ...alphaMap(0x1D400, 0x1D41A), ...digitMap(0x1D7CE) } },
+  { id: 'italic',         name: 'Italic',           map: alphaMap(0x1D434, 0x1D44E) },
+  { id: 'bold-italic',    name: 'Bold Italic',      map: { ...alphaMap(0x1D468, 0x1D482), ...digitMap(0x1D7CE) } },
+  { id: 'sans',           name: 'Sans-Serif',       map: { ...alphaMap(0x1D5A0, 0x1D5BA), ...digitMap(0x1D7E2) } },
+  { id: 'sans-bold',      name: 'Sans Bold',        map: { ...alphaMap(0x1D5D4, 0x1D5EE), ...digitMap(0x1D7EC) } },
+  { id: 'sans-italic',    name: 'Sans Italic',      map: { ...alphaMap(0x1D608, 0x1D622), ...digitMap(0x1D7E2) } },
+  { id: 'sans-bold-italic', name: 'Sans Bold Italic', map: { ...alphaMap(0x1D63C, 0x1D656), ...digitMap(0x1D7EC) } },
+  { id: 'script',         name: 'Script',           map: buildScriptMap() },
+  { id: 'bold-script',    name: 'Bold Script',      map: alphaMap(0x1D4D0, 0x1D4EA) },
+  { id: 'fraktur',        name: 'Fraktur',          map: buildFrakturMap() },
+  { id: 'bold-fraktur',   name: 'Bold Fraktur',     map: alphaMap(0x1D56C, 0x1D586) },
+  { id: 'monospace',      name: 'Monospace',        map: { ...alphaMap(0x1D670, 0x1D68A), ...digitMap(0x1D7F6) } },
+  { id: 'double-struck',  name: 'Double-Struck',    map: buildDoubleStruckMap() },
+  { id: 'circled',        name: 'Circled',          map: buildCircledMap() },
+  { id: 'squared',        name: 'Squared',          map: buildSquaredMap() },
+  { id: 'neg-squared',    name: 'Neg. Squared',     map: buildNegSquaredMap() },
+  { id: 'fullwidth',      name: 'Fullwidth',        map: buildFullwidthMap() },
+  { id: 'small-caps',     name: 'Small Caps',       map: buildSmallCapsMap() },
+  { id: 'superscript',    name: 'Superscript',      map: buildSuperscriptMap() },
+];
+
+const COMBINING = {
+  underline: '\u0332',
+  strikethrough: '\u0336',
+  overline: '\u0305',
+};
+
+// Fix italic 'h' exception: U+210E (Planck constant)
+STYLES.find(function(s) { return s.id === 'italic'; }).map['h'] = String.fromCodePoint(0x210E);
+
+// ── State ───────────────────────────────────────────────────────────────
+
+var favorites = new Set(JSON.parse(localStorage.getItem('sts-favorites') || '[]'));
+var modifiers = { underline: false, strikethrough: false, overline: false };
+var lastInput = localStorage.getItem('sts-input') || '';
+
+// ── Core Functions ──────────────────────────────────────────────────────
+
+function stylize(text, styleMap) {
+  var result = '';
+  for (var ch of text) {
+    var mapped = styleMap[ch] !== undefined ? styleMap[ch] : ch;
+    if (!/\s/.test(ch)) {
+      for (var mod in modifiers) {
+        if (modifiers[mod]) mapped += COMBINING[mod];
+      }
+    }
+    result += mapped;
+  }
+  return result;
+}
+
+function saveFavorites() {
+  localStorage.setItem('sts-favorites', JSON.stringify(Array.from(favorites)));
+}
+
+// ── DOM References ──────────────────────────────────────────────────────
+
+var inputEl = document.getElementById('input');
+var charCountEl = document.getElementById('charCount');
+var charBarEl = document.getElementById('charBar');
+var stylesGridEl = document.getElementById('stylesGrid');
+var favoritesGridEl = document.getElementById('favoritesGrid');
+var favoritesSectionEl = document.getElementById('favoritesSection');
+var globalToastEl = document.getElementById('globalToast');
+
+// ── Safe DOM Card Creation ──────────────────────────────────────────────
+
+function createElement(tag, className, textContent) {
+  var el = document.createElement(tag);
+  if (className) el.className = className;
+  if (textContent !== undefined) el.textContent = textContent;
+  return el;
+}
+
+function createCard(style, container) {
+  var card = createElement('div', 'style-card');
+  card.tabIndex = 0;
+  card.setAttribute('role', 'button');
+  card.setAttribute('aria-label', 'Copy ' + style.name + ' styled text');
+  card.dataset.styleId = style.id;
+  card.style.animationDelay = (STYLES.indexOf(style) * 0.02) + 's';
+
+  var header = createElement('div', 'card-header');
+  var nameEl = createElement('span', 'card-name', style.name);
+  var actions = createElement('div', 'card-actions');
+
+  var isFav = favorites.has(style.id);
+
+  var favBtn = createElement('button', 'card-btn fav-btn' + (isFav ? ' active' : ''));
+  favBtn.title = 'Toggle favorite';
+  favBtn.setAttribute('aria-label', 'Toggle favorite for ' + style.name);
+  favBtn.textContent = isFav ? '\u2605' : '\u2606';
+
+  var copyBtn = createElement('button', 'card-btn copy-btn');
+  copyBtn.title = 'Copy to clipboard';
+  copyBtn.setAttribute('aria-label', 'Copy ' + style.name + ' text');
+  copyBtn.textContent = '\u29C9';
+
+  actions.appendChild(favBtn);
+  actions.appendChild(copyBtn);
+  header.appendChild(nameEl);
+  header.appendChild(actions);
+
+  var preview = createElement('div', 'card-preview');
+  var toast = createElement('div', 'copy-toast', 'Copied!');
+
+  card.appendChild(header);
+  card.appendChild(preview);
+  card.appendChild(toast);
+
+  card.addEventListener('click', function(e) {
+    if (e.target.closest('.card-btn')) return;
+    copyFromCard(card, style);
+  });
+
+  card.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') {
+      e.preventDefault();
+      copyFromCard(card, style);
+    }
+  });
+
+  copyBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    copyFromCard(card, style);
+  });
+
+  favBtn.addEventListener('click', function(e) {
+    e.stopPropagation();
+    toggleFavorite(style.id);
+  });
+
+  container.appendChild(card);
+  return { card: card, preview: preview };
+}
+
+// ── Rendering ───────────────────────────────────────────────────────────
+
+var cardRefs = {};
+var favCardRefs = {};
+
+function buildGrid() {
+  stylesGridEl.textContent = '';
+  cardRefs = {};
+  for (var i = 0; i < STYLES.length; i++) {
+    cardRefs[STYLES[i].id] = createCard(STYLES[i], stylesGridEl);
+  }
+  rebuildFavorites();
+  updateAllPreviews();
+}
+
+function rebuildFavorites() {
+  favoritesGridEl.textContent = '';
+  favCardRefs = {};
+  var favStyles = STYLES.filter(function(s) { return favorites.has(s.id); });
+  favoritesSectionEl.classList.toggle('has-favorites', favStyles.length > 0);
+  for (var i = 0; i < favStyles.length; i++) {
+    favCardRefs[favStyles[i].id] = createCard(favStyles[i], favoritesGridEl);
+  }
+  updateAllPreviews();
+}
+
+function updateAllPreviews() {
+  var text = inputEl.value;
+  for (var i = 0; i < STYLES.length; i++) {
+    var style = STYLES[i];
+    var styled = text ? stylize(text, style.map) : '';
+    var refs = [cardRefs[style.id], favCardRefs[style.id]].filter(Boolean);
+    for (var j = 0; j < refs.length; j++) {
+      if (text) {
+        refs[j].preview.textContent = styled;
+        refs[j].preview.classList.remove('empty');
+      } else {
+        refs[j].preview.textContent = stylize('Preview', style.map);
+        refs[j].preview.classList.add('empty');
+      }
+    }
+  }
+}
+
+function updateCharCount() {
+  var len = inputEl.value.length;
+  var max = 280;
+  charCountEl.textContent = len + ' character' + (len !== 1 ? 's' : '');
+  var pct = Math.min((len / max) * 100, 100);
+  charBarEl.style.width = pct + '%';
+  charBarEl.style.background = len > max ? '#f28b82' : 'var(--accent)';
+}
+
+// ── Interactions ────────────────────────────────────────────────────────
+
+function copyFromCard(card, style) {
+  var text = inputEl.value;
+  if (!text) {
+    showToast('Type something first!');
+    return;
+  }
+  var styled = stylize(text, style.map);
+  navigator.clipboard.writeText(styled).then(function() {
+    card.classList.add('copied');
+    setTimeout(function() { card.classList.remove('copied'); }, 800);
+    showToast(style.name + ' copied!');
+  }).catch(function() {
+    var ta = document.createElement('textarea');
+    ta.value = styled;
+    ta.style.position = 'fixed';
+    ta.style.opacity = '0';
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    card.classList.add('copied');
+    setTimeout(function() { card.classList.remove('copied'); }, 800);
+    showToast(style.name + ' copied!');
+  });
+}
+
+var toastTimer = null;
+function showToast(msg) {
+  globalToastEl.textContent = msg;
+  globalToastEl.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(function() { globalToastEl.classList.remove('show'); }, 1500);
+}
+
+function toggleFavorite(styleId) {
+  if (favorites.has(styleId)) {
+    favorites.delete(styleId);
+  } else {
+    favorites.add(styleId);
+  }
+  saveFavorites();
+
+  var ref = cardRefs[styleId];
+  if (ref) {
+    var btn = ref.card.querySelector('.fav-btn');
+    btn.classList.toggle('active', favorites.has(styleId));
+    btn.textContent = favorites.has(styleId) ? '\u2605' : '\u2606';
+  }
+
+  rebuildFavorites();
+}
+
+function toggleModifier(mod) {
+  modifiers[mod] = !modifiers[mod];
+  updateAllPreviews();
+}
+
+// ── Event Wiring ────────────────────────────────────────────────────────
+
+inputEl.addEventListener('input', function() {
+  updateAllPreviews();
+  updateCharCount();
+  localStorage.setItem('sts-input', inputEl.value);
+});
+
+var modBtns = document.querySelectorAll('.mod-btn');
+for (var i = 0; i < modBtns.length; i++) {
+  (function(btn) {
+    btn.addEventListener('click', function() {
+      var mod = btn.dataset.mod;
+      toggleModifier(mod);
+      btn.classList.toggle('active');
+      btn.setAttribute('aria-pressed', modifiers[mod]);
+    });
+  })(modBtns[i]);
+}
+
+// ── Init ────────────────────────────────────────────────────────────────
+
+inputEl.value = lastInput;
+updateCharCount();
+buildGrid();
+</script>
+</body>
+</html>

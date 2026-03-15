@@ -1,26 +1,40 @@
 # Social Text Styler
 
-A single-file Python GUI tool that converts plain text into Unicode bold, italic, and underline characters for use on social media (Instagram, Facebook, X, LinkedIn, etc.).
+Convert plain text into Unicode-styled text for social media - Instagram, Facebook, X, LinkedIn, and more.
 
-## Features
+## Web Version (index.html)
 
-- **Font families:** Serif and Sans-Serif
-- **Styles:** Bold, Italic, Underline (independent toggles)
-- **Live preview** as you type
-- **Copy / Clear / Swap** controls
-- Zero dependencies beyond Python's built-in `tkinter`
+A single-file web app with no dependencies. Just open `index.html` in any browser.
 
-## Usage
+### Features
+
+- **19 Unicode styles** - Bold, Italic, Script, Fraktur, Double-Struck, Monospace, Circled, Squared, Fullwidth, Small Caps, Superscript, and more
+- **Live preview grid** - type once, see all styles simultaneously
+- **One-click copy** - click any style card to copy to clipboard
+- **Stackable modifiers** - underline, strikethrough, and overline combine with any style
+- **Favorites** - star frequently-used styles to pin them to the top (persisted in localStorage)
+- **Dark theme** with glass-morphism design
+- **Responsive** - works on desktop and mobile
+- **Keyboard accessible** - Tab to navigate, Enter/Space to copy
+- **Zero dependencies** - vanilla HTML/CSS/JS, works offline
+
+### Usage
+
+Open `index.html` in a browser, or serve it from any static host.
+
+## Python Version (social_text_styler.py)
+
+The original tkinter desktop GUI. Supports Serif/Sans-Serif with Bold, Italic, and Underline toggles.
 
 ```bash
 python social_text_styler.py
 ```
 
-Requires Python 3.10+ (uses `match`-style type hints). No pip install needed.
+Requires Python 3.10+.
 
 ## How It Works
 
-Maps ASCII A-Z, a-z, and 0-9 to their equivalents in the [Mathematical Alphanumeric Symbols](https://www.unicode.org/charts/PDF/U1D400.pdf) Unicode block. Underline uses the combining low line character (U+0332).
+Maps ASCII A-Z, a-z, and 0-9 to their equivalents in Unicode's [Mathematical Alphanumeric Symbols](https://www.unicode.org/charts/PDF/U1D400.pdf) block and other styled character ranges. Modifiers use combining characters (U+0332 underline, U+0336 strikethrough, U+0305 overline).
 
 ## License
 

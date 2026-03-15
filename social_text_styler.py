@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Social Text Styler — a tiny GUI to generate bold/italic/underline Unicode text for social media.
+Social Text Styler - a tiny GUI to generate bold/italic/underline Unicode text for social media.
 
 Features
 - Family: Serif or Sans‑Serif
@@ -61,7 +61,7 @@ StyleKey = tuple[str, bool, bool]  # (family, bold, italic)
 
 
 def _alpha_map(start_uc: int, start_lc: int) -> dict[str, str]:
-    """Build A–Z and a–z mapping starting at the given Unicode blocks."""
+    """Build A-Z and a-z mapping starting at the given Unicode blocks."""
     m: dict[str, str] = {}
     for i in range(26):
         m[chr(A_ORD + i)] = chr(start_uc + i)
@@ -149,7 +149,7 @@ class App(ttk.Frame):
         header = ttk.Frame(self)
         header.pack(fill='x', pady=(0, 12))
         ttk.Label(header, text='Social Text Styler', font=('Segoe UI', 18, 'bold')).pack(side='left')
-        ttk.Label(header, text='  —  make your posts pop', font=('Segoe UI', 10)).pack(side='left')
+        ttk.Label(header, text='  -  make your posts pop', font=('Segoe UI', 10)).pack(side='left')
 
         # Controls row
         controls = ttk.Frame(self)
